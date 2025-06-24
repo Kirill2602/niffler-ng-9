@@ -2,9 +2,9 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.SelenideElement;
 
+import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LoginPage {
     private final SelenideElement
@@ -32,12 +32,12 @@ public class LoginPage {
     }
 
     public LoginPage checkLoginHeader(String headerText) {
-        assertEquals(headerText, loginHeader.getText());
+        loginHeader.shouldHave(text(headerText));
         return this;
     }
 
     public LoginPage checkErrorMessageBlock(String errorMessageText) {
-        assertEquals(errorMessageText, errorMessageBlock.getText());
+        errorMessageBlock.shouldHave(text(errorMessageText));
         return this;
     }
 }

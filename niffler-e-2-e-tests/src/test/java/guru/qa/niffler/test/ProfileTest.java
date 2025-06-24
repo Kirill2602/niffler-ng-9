@@ -14,8 +14,7 @@ public class ProfileTest {
 
     @Category(
             name = "Test category",
-            username = "duck",
-            archived = false
+            username = "duck"
     )
     @Test
     @DisplayName("Архивация категории")
@@ -34,7 +33,6 @@ public class ProfileTest {
 
     @Category(
             name = "1",
-            username = "Kirill",
             archived = true
     )
     @Test

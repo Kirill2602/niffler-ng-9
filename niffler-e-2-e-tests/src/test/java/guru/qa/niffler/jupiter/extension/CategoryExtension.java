@@ -23,7 +23,7 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                     null,
                     annotation.name() + " " + categoryName,
                     annotation.username(),
-                    annotation.archived()
+                    false
             );
             CategoryJson created = categoryApiClient.addCategory(categoryJson);
             if (annotation.archived()) {

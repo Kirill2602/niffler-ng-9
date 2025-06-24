@@ -6,7 +6,6 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegistrationPage {
     private final SelenideElement
@@ -46,7 +45,7 @@ public class RegistrationPage {
     }
 
     public RegistrationPage checkErrorMessage(String errorMessage) {
-        assertEquals(errorMessage, errorMessageBlock.getText());
+        errorMessageBlock.shouldHave(text(errorMessage));
         return this;
     }
 
