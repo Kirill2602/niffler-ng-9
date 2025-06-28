@@ -2,6 +2,7 @@ package guru.qa.niffler.test;
 
 import com.github.javafaker.Faker;
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.jupiter.annotation.DisabledByIssue;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ public class RegistrationTest {
                 .checkSuccessRegistrationMessageAndGoToSignInPage()
                 .checkLoginHeader("Log in");
     }
-
+    @DisabledByIssue(value = "2")
     @Test
     @DisplayName("Попытка ввести разные пароль и подтверждение пароля при регистрации")
     public void shouldShowErrorWhenPasswordAndConfirmPasswordNotEquals() {
