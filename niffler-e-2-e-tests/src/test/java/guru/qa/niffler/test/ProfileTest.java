@@ -2,6 +2,7 @@ package guru.qa.niffler.test;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.Category;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.DisplayName;
@@ -11,16 +12,17 @@ import static com.codeborne.selenide.Selenide.open;
 
 public class ProfileTest {
     private final Config CFG = Config.getInstance();
-//TODO
-//    @Category(
-//            name = "Test category",
-//            username = "duck"
-//    )
+
+    @User(
+            username = "duck",
+            categories = {@Category(name = "Test category")}
+    )
+
     @Test
     @DisplayName("Архивация категории")
     public void checkThatCategoryIsArchived(CategoryJson categoryJson) {
         open(CFG.frontUrl(), LoginPage.class)
-                .fillLoginPage("duck", "12345")
+                .fillLoginPage(categoryJson.username(), "12345")
                 .submit()
                 .goToProfile("Profile")
                 .checkVisibilityOfProfileHeader()
@@ -31,15 +33,14 @@ public class ProfileTest {
                 .checkCategoryStatus(categoryJson.name());
     }
 
-    @Category(
-            name = "1",
-            archived = true
+    @User(
+            categories = {@Category(name = "1", archived = true)}
     )
     @Test
     @DisplayName("Восстановление категории из архива")
     public void checkThatCategoryIsUnArchive(CategoryJson categoryJson) {
         open(CFG.frontUrl(), LoginPage.class)
-                .fillLoginPage("Kirill", "12345")
+                .fillLoginPage(categoryJson.username(), "12345")
                 .submit()
                 .goToProfile("Profile")
                 .checkVisibilityOfProfileHeader()
