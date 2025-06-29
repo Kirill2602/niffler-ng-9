@@ -1,16 +1,16 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.SpendApiClient;
-import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
-import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.util.Date;
+
+import static guru.qa.niffler.utils.RandomDataUtils.getRandomCategoryName;
 
 public class SpendingExtension implements BeforeEachCallback, ParameterResolver {
 
@@ -24,8 +24,14 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                 User.class
         ).orElse(null);
         if (userAnnotation != null && userAnnotation.spendings().length > 0) {
-            CategoryJson categoryJson = context.getStore(CategoryExtension.NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
-            SpendJson spendJson = createSpend(userAnnotation, categoryJson, userAnnotation.spendings()[0]);
+            CategoryJson categoryJson;
+            SpendJson spendJson = null;
+            categoryJson = context.getStore(CategoryExtension.NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
+            if (categoryJson != null) {
+                spendJson = createSpend(userAnnotation, categoryJson, userAnnotation.spendings()[0]);
+            } else {
+                spendJson = createSpend(userAnnotation, userAnnotation.spendings()[0]);
+            }
             context.getStore(NAMESPACE).put(
                     context.getUniqueId(),
                     spendApiClient.addSpend(spendJson)
@@ -44,6 +50,24 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
     }
 
     private SpendJson createSpend(User user, CategoryJson categoryJson, Spending spend) {
+        return new SpendJson(
+                null,
+                new Date(),
+                categoryJson,
+                spend.currency(),
+                spend.amount(),
+                spend.description(),
+                user.username()
+        );
+    }
+
+    private SpendJson createSpend(User user, Spending spend) {
+        CategoryJson categoryJson = new CategoryJson(
+                null,
+                getRandomCategoryName(),
+                user.username(),
+                false
+        );
         return new SpendJson(
                 null,
                 new Date(),
