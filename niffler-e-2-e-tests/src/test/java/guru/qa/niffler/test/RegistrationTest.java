@@ -1,6 +1,5 @@
 package guru.qa.niffler.test;
 
-import com.github.javafaker.Faker;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.DisabledByIssue;
 import guru.qa.niffler.page.LoginPage;
@@ -8,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static com.codeborne.selenide.Selenide.open;
+import static guru.qa.niffler.utils.RandomDataUtils.getRandomUsername;
 
 public class RegistrationTest {
     private final Config CFG = Config.getInstance();
@@ -15,15 +15,15 @@ public class RegistrationTest {
     @Test
     @DisplayName("Успешная регистрация")
     public void modalWindowShodBeVisibleAfterSuccessRegistration() {
-        Faker faker = new Faker();
-        final String username = faker.name().username();
+
         open(CFG.frontUrl(), LoginPage.class)
                 .clickOnCreateAccountButton()
                 .checkHeaderText("Sign up")
-                .fillingRegistrationPage(username, "12345", "12345")
+                .fillingRegistrationPage(getRandomUsername(), "12345", "12345")
                 .checkSuccessRegistrationMessageAndGoToSignInPage()
                 .checkLoginHeader("Log in");
     }
+
     @DisabledByIssue(value = "2")
     @Test
     @DisplayName("Попытка ввести разные пароль и подтверждение пароля при регистрации")

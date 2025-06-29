@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 public class SpendingTest {
 
   private static final Config CFG = Config.getInstance();
-
-  @Spending(
-      username = "duck",
-      amount = 89990.00,
-      description = "Advanced 9 поток!",
-      category = "Обучение"
-  )
+//TODO
+//  @Spending(
+//      username = "duck",
+//      amount = 89990.00,
+//      description = "Advanced 9 поток!",
+//      category = "Обучение"
+//  )
   @Test
   void mainPageShouldBeDisplayedAfterSuccessLogin(SpendJson spendJson) {
     final String newDescription = ":)";

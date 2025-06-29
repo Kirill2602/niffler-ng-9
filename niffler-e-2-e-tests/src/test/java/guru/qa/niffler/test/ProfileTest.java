@@ -11,11 +11,11 @@ import static com.codeborne.selenide.Selenide.open;
 
 public class ProfileTest {
     private final Config CFG = Config.getInstance();
-
-    @Category(
-            name = "Test category",
-            username = "duck"
-    )
+//TODO
+//    @Category(
+//            name = "Test category",
+//            username = "duck"
+//    )
     @Test
     @DisplayName("Архивация категории")
     public void checkThatCategoryIsArchived(CategoryJson categoryJson) {
