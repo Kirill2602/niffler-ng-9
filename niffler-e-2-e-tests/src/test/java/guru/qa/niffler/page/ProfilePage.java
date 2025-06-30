@@ -4,8 +4,7 @@ import com.codeborne.selenide.SelenideElement;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$$x;
-import static com.codeborne.selenide.Selenide.$x;
+import static com.codeborne.selenide.Selenide.*;
 import static java.lang.String.format;
 
 public class ProfilePage {
@@ -29,6 +28,7 @@ public class ProfilePage {
     }
 
     public ProfilePage clickOnArchivedToggle() {
+        executeJavaScript("window.scrollTo(0,0)");
         archivedToggle.click();
         return this;
     }

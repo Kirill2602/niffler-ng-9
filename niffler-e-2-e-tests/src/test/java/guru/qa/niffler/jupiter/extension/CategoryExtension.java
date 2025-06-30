@@ -1,11 +1,13 @@
 package guru.qa.niffler.jupiter.extension;
 
-import com.github.javafaker.Faker;
 import guru.qa.niffler.api.CategoryApiClient;
 import guru.qa.niffler.jupiter.annotation.Category;
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
+
+import static guru.qa.niffler.utils.RandomDataUtils.getRandomCategoryName;
 
 public class CategoryExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
@@ -13,20 +15,20 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        Faker faker = new Faker();
-        String categoryName = faker.funnyName().name();
-        AnnotationSupport.findAnnotation(
+        User userAnnotation = AnnotationSupport.findAnnotation(
                 context.getRequiredTestMethod(),
-                Category.class
-        ).ifPresent(annotation -> {
+                User.class
+        ).orElse(null);
+        if (userAnnotation != null && userAnnotation.categories().length > 0) {
+            Category category = userAnnotation.categories()[0];
             CategoryJson categoryJson = new CategoryJson(
                     null,
-                    annotation.name() + " " + categoryName,
-                    annotation.username(),
+                    category.name() + " " + getRandomCategoryName(),
+                    userAnnotation.username(),
                     false
             );
             CategoryJson created = categoryApiClient.addCategory(categoryJson);
-            if (annotation.archived()) {
+            if (category.archived()) {
                 CategoryJson archivedCategory = new CategoryJson(
                         created.id(),
                         created.name(),
@@ -36,20 +38,28 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 created = categoryApiClient.updateCategory(archivedCategory);
             }
             context.getStore(NAMESPACE).put(context.getUniqueId(), created);
-        });
+
+        }
     }
 
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
-        CategoryJson category = context.getStore(NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
-        if (!category.archived()) {
-            CategoryJson archivedCategory = new CategoryJson(
-                    category.id(),
-                    category.name(),
-                    category.username(),
-                    true
-            );
-            context.getStore(NAMESPACE).put(context.getUniqueId(), categoryApiClient.updateCategory(archivedCategory));
+        User userAnnotation =
+                AnnotationSupport.findAnnotation(
+                        context.getRequiredTestMethod(),
+                        User.class
+                ).orElse(null);
+        if (userAnnotation != null && userAnnotation.categories().length > 0) {
+            CategoryJson category = context.getStore(NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
+            if (!category.archived()) {
+                CategoryJson archivedCategory = new CategoryJson(
+                        category.id(),
+                        category.name(),
+                        category.username(),
+                        true
+                );
+                context.getStore(NAMESPACE).put(context.getUniqueId(), categoryApiClient.updateCategory(archivedCategory));
+            }
         }
     }
 

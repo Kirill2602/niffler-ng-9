@@ -14,7 +14,8 @@ public class MainPage {
             profileIcon = $x("//*[@data-testid=\"PersonIcon\"]//ancestor::button");
 
     private final String
-            profileDropdownItemsStrTemplate = "//a[text()='%s']";
+            profileDropdownItemsStrTemplate = "//a[text()='%s']",
+            spendStrTemplate = "//span[text()='%s']//ancestor::td//parent::tr";
 
     public MainPage checkThatPageLoaded() {
         spendingTable.should(visible);
@@ -35,9 +36,17 @@ public class MainPage {
         return this;
     }
 
+    public MainPage checkSpending(String category, String amount, String description) {
+        $x(format(spendStrTemplate, category)).shouldBe(visible)
+                .shouldHave(text(description))
+                .shouldHave(text(amount));
+        return this;
+    }
+
     public ProfilePage goToProfile(String itemName) {
         profileIcon.click();
         $x(format(profileDropdownItemsStrTemplate, itemName)).click();
         return new ProfilePage();
     }
+
 }
