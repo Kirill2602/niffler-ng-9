@@ -1,6 +1,7 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.CategoryApiClient;
+import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import org.junit.jupiter.api.extension.*;
@@ -19,14 +20,15 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 User.class
         ).orElse(null);
         if (userAnnotation != null && userAnnotation.categories().length > 0) {
+            Category category = userAnnotation.categories()[0];
             CategoryJson categoryJson = new CategoryJson(
                     null,
-                    userAnnotation.categories()[0].name() + " " + getRandomCategoryName(),
+                    category.name() + " " + getRandomCategoryName(),
                     userAnnotation.username(),
                     false
             );
             CategoryJson created = categoryApiClient.addCategory(categoryJson);
-            if (userAnnotation.categories()[0].archived()) {
+            if (category.archived()) {
                 CategoryJson archivedCategory = new CategoryJson(
                         created.id(),
                         created.name(),
