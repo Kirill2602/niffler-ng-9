@@ -1,9 +1,11 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.api.CategoryApiClient;
+import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.service.SpendDbClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
@@ -12,6 +14,7 @@ import static guru.qa.niffler.utils.RandomDataUtils.getRandomCategoryName;
 public class CategoryExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
     private final CategoryApiClient categoryApiClient = new CategoryApiClient();
+    private final SpendDbClient spendDbClient = new SpendDbClient();
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
@@ -27,7 +30,8 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                     userAnnotation.username(),
                     false
             );
-            CategoryJson created = categoryApiClient.addCategory(categoryJson);
+            CategoryJson created =
+                    CategoryJson.fromEntity(spendDbClient.createCategory(CategoryEntity.fromJson(categoryJson)));
             if (category.archived()) {
                 CategoryJson archivedCategory = new CategoryJson(
                         created.id(),
@@ -38,7 +42,6 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 created = categoryApiClient.updateCategory(archivedCategory);
             }
             context.getStore(NAMESPACE).put(context.getUniqueId(), created);
-
         }
     }
 
@@ -58,7 +61,8 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                         category.username(),
                         true
                 );
-                context.getStore(NAMESPACE).put(context.getUniqueId(), categoryApiClient.updateCategory(archivedCategory));
+                context.getStore(NAMESPACE).put(context.getUniqueId(),
+                        categoryApiClient.updateCategory(archivedCategory));
             }
         }
     }
