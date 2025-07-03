@@ -15,7 +15,7 @@ public class ProfileTest {
 
     @User(
             username = "duck",
-            categories = {@Category(name = "Test category")}
+            categories = {@Category(name = "Test category0")}
     )
 
     @Test
