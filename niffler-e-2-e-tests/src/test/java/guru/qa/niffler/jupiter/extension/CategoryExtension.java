@@ -18,31 +18,18 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
+        CategoryJson created = null;
         User userAnnotation = AnnotationSupport.findAnnotation(
                 context.getRequiredTestMethod(),
                 User.class
         ).orElse(null);
         if (userAnnotation != null && userAnnotation.categories().length > 0) {
             Category category = userAnnotation.categories()[0];
-            CategoryJson categoryJson = new CategoryJson(
-                    null,
-                    category.name() + " " + getRandomCategoryName(),
-                    userAnnotation.username(),
-                    false
-            );
-            CategoryJson created =
+            CategoryJson categoryJson = getCategory(category, userAnnotation.username());
+            created =
                     CategoryJson.fromEntity(spendDbClient.createCategory(CategoryEntity.fromJson(categoryJson)));
-            if (category.archived()) {
-                CategoryJson archivedCategory = new CategoryJson(
-                        created.id(),
-                        created.name(),
-                        created.username(),
-                        true
-                );
-                created = categoryApiClient.updateCategory(archivedCategory);
-            }
-            context.getStore(NAMESPACE).put(context.getUniqueId(), created);
         }
+        context.getStore(NAMESPACE).put(context.getUniqueId(), created);
     }
 
     @Override
@@ -76,4 +63,25 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         return extensionContext.getStore(NAMESPACE).get(extensionContext.getUniqueId(), CategoryJson.class);
     }
+
+    private CategoryJson getCategory(Category category, String username) {
+        CategoryJson categoryJson = null;
+        if (category.archived()) {
+            categoryJson = new CategoryJson(
+                    null,
+                    category.name() + " " + getRandomCategoryName(),
+                    username,
+                    false
+            );
+        } else {
+            categoryJson = new CategoryJson(
+                    null,
+                    category.name() + " " + getRandomCategoryName(),
+                    username,
+                    true
+            );
+        }
+        return categoryJson;
+    }
 }
+
