@@ -9,7 +9,10 @@ import guru.qa.niffler.service.SpendDbClient;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
+import java.sql.Connection;
+
 import static guru.qa.niffler.utils.RandomDataUtils.getRandomCategoryName;
+import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
 public class CategoryExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
@@ -27,7 +30,7 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
             Category category = userAnnotation.categories()[0];
             CategoryJson categoryJson = getCategory(category, userAnnotation.username());
             created =
-                    CategoryJson.fromEntity(spendDbClient.createCategory(CategoryEntity.fromJson(categoryJson)));
+                    CategoryJson.fromEntity(spendDbClient.createCategory(CategoryEntity.fromJson(categoryJson), TRANSACTION_READ_COMMITTED));
         }
         context.getStore(NAMESPACE).put(context.getUniqueId(), created);
     }

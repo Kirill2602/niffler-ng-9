@@ -11,6 +11,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import java.util.Date;
 
 import static guru.qa.niffler.utils.RandomDataUtils.getRandomCategoryName;
+import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
 public class SpendingExtension implements BeforeEachCallback, ParameterResolver {
 
@@ -34,7 +35,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
             }
             context.getStore(NAMESPACE).put(
                     context.getUniqueId(),
-                    spendDbClient.createSpend(spendJson)
+                    spendDbClient.create(spendJson, TRANSACTION_READ_COMMITTED)
             );
         }
     }
