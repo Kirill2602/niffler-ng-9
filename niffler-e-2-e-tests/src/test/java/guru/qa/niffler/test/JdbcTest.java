@@ -1,17 +1,27 @@
 package guru.qa.niffler.test;
 
+import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.Databases;
+import guru.qa.niffler.data.dao.AuthAuthorityDao;
+import guru.qa.niffler.data.dao.UserdataUserDao;
+import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoSpringJdbc;
+import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.auth.Authority;
+import guru.qa.niffler.model.auth.AuthorityJson;
 import guru.qa.niffler.service.AuthDbClient;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UserDataDbClient;
 import org.junit.jupiter.api.Test;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.Date;
+import java.util.Optional;
 
 import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
 import static java.sql.Connection.TRANSACTION_SERIALIZABLE;
@@ -68,5 +78,29 @@ public class JdbcTest {
         userEntity.setCredentialsNonExpired(true);
         guru.qa.niffler.data.entity.authority.UserEntity user = authDbClient.createUser(userEntity, TRANSACTION_SERIALIZABLE);
         System.out.println(guru.qa.niffler.model.auth.UserJson.fromEntity(user));
+    }
+
+    @Test
+    void dbTes2() {
+        DataSource dataSource = Databases.dataSource(Config.getInstance().userdataJdbcUrl());
+        UserdataUserDao userDao = new UserdataUserDaoSpringJdbc(dataSource);
+        UserEntity user = userDao.findByUsername("Kirill").get();
+        System.out.println(UserJson.fromEntity(user));
+    }
+
+    @Test
+    void dbTes3() {
+        DataSource dataSource = Databases.dataSource(Config.getInstance().userdataJdbcUrl());
+        UserdataUserDao userDao = new UserdataUserDaoSpringJdbc(dataSource);
+        userDao.findAll().forEach(user -> System.out.println(UserJson.fromEntity(user)));
+    }
+
+    @Test
+    void dbTes4() {
+        DataSource dataSource = Databases.dataSource(Config.getInstance().authJdbcUrl());
+        AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoSpringJdbc(dataSource);
+        authAuthorityDao.findAllAuthorities()
+                .forEach(a-> System.out.println(AuthorityJson.fromEntity(a)));
+
     }
 }
