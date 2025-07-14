@@ -48,7 +48,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
     }
 
     @Override
-    public List<UserEntity> findAllUsers() {
+    public List<UserEntity> findAll() {
         List<UserEntity> users = new ArrayList<>();
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "SELECT * FROM \"user\"")) {

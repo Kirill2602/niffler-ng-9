@@ -1,6 +1,5 @@
 package guru.qa.niffler.test;
 
-import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.AuthAuthorityDao;
 import guru.qa.niffler.data.dao.UserdataUserDao;
 import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoSpringJdbc;
@@ -17,10 +16,7 @@ import guru.qa.niffler.service.UserDataDbClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
 import java.util.Date;
-
-import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
 public class JdbcTest {
     @Test
@@ -33,7 +29,7 @@ public class JdbcTest {
                         new Date(),
                         new CategoryJson(
                                 null,
-                                "cat-name-tx-6",
+                                "cat-name-tx-66",
                                 "duck",
                                 false
                         ),
@@ -92,7 +88,7 @@ public class JdbcTest {
     @Test
     void dbTes4() {
         AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoSpringJdbc();
-        authAuthorityDao.findAllAuthorities()
+        authAuthorityDao.findAll()
                 .forEach(a -> System.out.println(AuthorityJson.fromEntity(a)));
     }
 
