@@ -6,6 +6,8 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class AuthUserDaoJdbc implements AuthUserDao {
@@ -14,6 +16,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
     public AuthUserDaoJdbc(Connection connection) {
         this.connection = connection;
     }
+
     private static final PasswordEncoder PASSWORD = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     @Override
@@ -42,5 +45,29 @@ public class AuthUserDaoJdbc implements AuthUserDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<UserEntity> findAllUsers() {
+        List<UserEntity> users = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM \"user\"")) {
+            try (ResultSet rs = ps.getResultSet()) {
+                if (rs.next()) {
+                    while (rs.next()) {
+                        UserEntity userEntity = new UserEntity();
+                        userEntity.setUsername(rs.getString("username"));
+                        userEntity.setPassword(PASSWORD.encode(rs.getString("password")));
+                        userEntity.setAccountNonExpired(rs.getBoolean("account_non_expired"));
+                        userEntity.setAccountNonLocked(rs.getBoolean("account_non_locked"));
+                        userEntity.setCredentialsNonExpired(rs.getBoolean("credentials_non_expired"));
+                        users.add(userEntity);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
     }
 }
