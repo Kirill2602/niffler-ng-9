@@ -1,5 +1,6 @@
 package guru.qa.niffler.data.dao.impl;
 
+import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.AuthUserDao;
 import guru.qa.niffler.data.entity.authority.UserEntity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -10,18 +11,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AuthUserDaoJdbc implements AuthUserDao {
-    private final Connection connection;
+import static guru.qa.niffler.data.tpl.Connections.holder;
 
-    public AuthUserDaoJdbc(Connection connection) {
-        this.connection = connection;
-    }
+public class AuthUserDaoJdbc implements AuthUserDao {
+    private static final Config CFG = Config.getInstance();
+
 
     private static final PasswordEncoder PASSWORD = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     @Override
     public UserEntity createUser(UserEntity userEntity) {
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "INSERT INTO \"user\" (username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired)" +
                         "VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, userEntity.getUsername());
@@ -48,9 +48,9 @@ public class AuthUserDaoJdbc implements AuthUserDao {
     }
 
     @Override
-    public List<UserEntity> findAllUsers() {
+    public List<UserEntity> findAll() {
         List<UserEntity> users = new ArrayList<>();
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "SELECT * FROM \"user\"")) {
             try (ResultSet rs = ps.getResultSet()) {
                 if (rs.next()) {

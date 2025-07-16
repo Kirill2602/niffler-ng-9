@@ -1,9 +1,5 @@
 package guru.qa.niffler.data.mapper;
 
-import guru.qa.niffler.config.Config;
-import guru.qa.niffler.data.Databases;
-import guru.qa.niffler.data.dao.impl.AuthUserDaoSpringJdbc;
-import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
 import guru.qa.niffler.data.entity.authority.AuthorityEntity;
 import guru.qa.niffler.data.entity.authority.UserEntity;
 import guru.qa.niffler.model.auth.Authority;

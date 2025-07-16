@@ -7,5 +7,5 @@ import java.util.List;
 public interface AuthUserDao {
     UserEntity createUser(UserEntity userEntity);
 
-    List<UserEntity> findAllUsers();
+    List<UserEntity> findAll();
 }

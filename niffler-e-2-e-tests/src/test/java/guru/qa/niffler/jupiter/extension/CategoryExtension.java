@@ -30,7 +30,7 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
             Category category = userAnnotation.categories()[0];
             CategoryJson categoryJson = getCategory(category, userAnnotation.username());
             created =
-                    CategoryJson.fromEntity(spendDbClient.createCategory(CategoryEntity.fromJson(categoryJson), TRANSACTION_READ_COMMITTED));
+                    CategoryJson.fromEntity(spendDbClient.createCategory(CategoryEntity.fromJson(categoryJson)));
         }
         context.getStore(NAMESPACE).put(context.getUniqueId(), created);
     }

@@ -35,7 +35,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
             }
             context.getStore(NAMESPACE).put(
                     context.getUniqueId(),
-                    spendDbClient.create(spendJson, TRANSACTION_READ_COMMITTED)
+                    spendDbClient.create(spendJson)
             );
         }
     }

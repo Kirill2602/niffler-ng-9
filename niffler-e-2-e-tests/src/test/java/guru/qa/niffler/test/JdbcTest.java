@@ -1,7 +1,5 @@
 package guru.qa.niffler.test;
 
-import guru.qa.niffler.config.Config;
-import guru.qa.niffler.data.Databases;
 import guru.qa.niffler.data.dao.AuthAuthorityDao;
 import guru.qa.niffler.data.dao.UserdataUserDao;
 import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoSpringJdbc;
@@ -11,20 +9,14 @@ import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
-import guru.qa.niffler.model.auth.Authority;
 import guru.qa.niffler.model.auth.AuthorityJson;
 import guru.qa.niffler.service.AuthDbClient;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UserDataDbClient;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.Date;
-import java.util.Optional;
-
-import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
-import static java.sql.Connection.TRANSACTION_SERIALIZABLE;
 
 public class JdbcTest {
     @Test
@@ -37,7 +29,7 @@ public class JdbcTest {
                         new Date(),
                         new CategoryJson(
                                 null,
-                                "cat-name-tx-6",
+                                "cat-name-tx-66",
                                 "duck",
                                 false
                         ),
@@ -45,7 +37,7 @@ public class JdbcTest {
                         1000.0,
                         "spend-name-tx-0",
                         "duck"
-                ), TRANSACTION_READ_COMMITTED
+                )
         );
 
         System.out.println(spend);
@@ -62,7 +54,7 @@ public class JdbcTest {
         userEntity.setPhoto(new byte[]{1, 2, 3});
         userEntity.setPhotoSmall(new byte[]{4, 5, 6});
         userEntity.setCurrency(CurrencyValues.USD);
-        UserEntity user = usersDbClient.createUser(userEntity, TRANSACTION_READ_COMMITTED);
+        UserEntity user = usersDbClient.createUser(userEntity);
         System.out.println(UserJson.fromEntity(user));
     }
 
@@ -76,31 +68,49 @@ public class JdbcTest {
         userEntity.setAccountNonExpired(true);
         userEntity.setAccountNonLocked(true);
         userEntity.setCredentialsNonExpired(true);
-        guru.qa.niffler.data.entity.authority.UserEntity user = authDbClient.createUser(userEntity, TRANSACTION_SERIALIZABLE);
+        guru.qa.niffler.data.entity.authority.UserEntity user = authDbClient.createUser(userEntity);
         System.out.println(guru.qa.niffler.model.auth.UserJson.fromEntity(user));
     }
 
     @Test
     void dbTes2() {
-        DataSource dataSource = Databases.dataSource(Config.getInstance().userdataJdbcUrl());
-        UserdataUserDao userDao = new UserdataUserDaoSpringJdbc(dataSource);
+        UserdataUserDao userDao = new UserdataUserDaoSpringJdbc();
         UserEntity user = userDao.findByUsername("Kirill").get();
         System.out.println(UserJson.fromEntity(user));
     }
 
     @Test
     void dbTes3() {
-        DataSource dataSource = Databases.dataSource(Config.getInstance().userdataJdbcUrl());
-        UserdataUserDao userDao = new UserdataUserDaoSpringJdbc(dataSource);
+        UserdataUserDao userDao = new UserdataUserDaoSpringJdbc();
         userDao.findAll().forEach(user -> System.out.println(UserJson.fromEntity(user)));
     }
 
     @Test
     void dbTes4() {
-        DataSource dataSource = Databases.dataSource(Config.getInstance().authJdbcUrl());
-        AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoSpringJdbc(dataSource);
-        authAuthorityDao.findAllAuthorities()
-                .forEach(a-> System.out.println(AuthorityJson.fromEntity(a)));
-
+        AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoSpringJdbc();
+        authAuthorityDao.findAll()
+                .forEach(a -> System.out.println(AuthorityJson.fromEntity(a)));
     }
+
+    @Test
+    @DisplayName("createUserWithChained")
+    void dbTes5() {
+        AuthDbClient client = new AuthDbClient();
+        guru.qa.niffler.data.entity.authority.UserEntity userEntity = new guru.qa.niffler.data.entity.authority.UserEntity();
+        userEntity.setUsername("username112");
+        userEntity.setPassword("password99");
+        userEntity.setEnabled(true);
+        userEntity.setAccountNonExpired(true);
+        userEntity.setAccountNonLocked(true);
+        userEntity.setCredentialsNonExpired(true);
+        guru.qa.niffler.data.entity.authority.UserEntity user = client.createUserWithChained(userEntity);
+        System.out.println(guru.qa.niffler.model.auth.UserJson.fromEntity(user));
+    }
+    /*
+     * C username = null
+     * вставка не идет в обе таблицы user и authority
+     * ===============================================
+     * С валидным юзером и в setAuthority(null)
+     * в таблицу user происходит запись, а в authority нет (не происходит откат)
+     * */
 }
